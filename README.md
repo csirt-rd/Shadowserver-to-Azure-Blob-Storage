@@ -15,7 +15,6 @@
 #### Requerimientos:
 
 * [Python3.8+](https://www.python.org/downloads/)
-* Archivos CSV de ShadowServer REST API
 
 #### Como ejecutar:
 
