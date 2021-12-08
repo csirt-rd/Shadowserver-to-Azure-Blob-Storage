@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from datetime import datetime, timedelta
 import threading, requests, re
 from azure.storage.blob import BlobClient
 from azure.core.exceptions import ResourceExistsError
