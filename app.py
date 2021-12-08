@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 from datetime import datetime, timedelta
-import os
-import threading
+import threading, requests, re
 from azure.storage.blob import BlobClient
 from azure.core.exceptions import ResourceExistsError
+
+#Shadowserver Info
+MATCH = '(https:\/\/dl.shadowserver.org\/[^"]+)'
+SS_URL = "https://dl.shadowserver.org/reports/index.php"
 
 # Azure Storage Blob Info
 AZURE_ACC_KEY = ""
@@ -14,26 +17,34 @@ AZURE_CONN_STR = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={};En
     AZURE_ACC_NAME, AZURE_ACC_KEY, AZURE_ENDPOINT_SUFFIX
 )
 
-def disk_to_blob(folder, date):
-    FILE = '-'.join([date.strftime("%Y-%m-%d"), folder]) + '.csv'
-    BLOB = os.path.join(folder, FILE)
-    SHADOW_FILE = os.path.join(MY_PATH, folder, FILE)
-    with BlobClient.from_connection_string(conn_str=AZURE_CONN_STR, container_name="shadowserver", blob_name=BLOB) as blob:
-        try:
-            with open(SHADOW_FILE, 'rb') as data:
+def ss_to_blob(session, url):
+    try:
+        RESPONSE = session.get(url)
+        if RESPONSE.status_code == 200:
+            FILENAME = re.findall("filename=(.+)", RESPONSE.headers['content-disposition'])[0]
+            with BlobClient.from_connection_string(conn_str=AZURE_CONN_STR, container_name="", blob_name=FILENAME) as blob:
                 try:
-                    blob.upload_blob(data)
+                    blob.upload_blob(RESPONSE.content)
                 except ResourceExistsError:
                     pass
-        except FileNotFoundError:
-            pass
+    except:
+        pass
 
 if __name__ == "__main__":
-    yesterday = datetime.now() - timedelta(1)
-    MY_PATH = os.path.join(os.getcwd(),'shadowserver')
+    SESSION = requests.Session()
+    RESPONSE = SESSION.post(
+        SS_URL,
+        data={
+        'user': "",
+        'password': "",
+        'login':'Login'
+        }
+    )
+    HTML_CONTENT = RESPONSE.content.decode('utf-8')
     threads = list()
-    for d in os.listdir(MY_PATH):
-        x = threading.Thread(target=disk_to_blob, args=(d, yesterday), daemon=True)
+    for download_me in re.finditer(MATCH, HTML_CONTENT, re.MULTILINE):
+        URL = download_me.group(1)
+        x = threading.Thread(target=ss_to_blob, args=(SESSION, URL), daemon=True)
         threads.append(x)
         x.start()
     for index, thread in enumerate(threads):
