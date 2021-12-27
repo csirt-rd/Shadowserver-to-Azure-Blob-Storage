@@ -21,7 +21,8 @@ def ss_to_blob(session, url):
         RESPONSE = session.get(url)
         if RESPONSE.status_code == 200:
             FILENAME = re.findall("filename=(.+)", RESPONSE.headers['content-disposition'])[0]
-            with BlobClient.from_connection_string(conn_str=AZURE_CONN_STR, container_name="", blob_name=FILENAME) as blob:
+            BLOB = '/'.join([FILENAME[11:-4], FILENAME])
+            with BlobClient.from_connection_string(conn_str=AZURE_CONN_STR, container_name="", blob_name=BLOB) as blob:
                 try:
                     blob.upload_blob(RESPONSE.content)
                 except ResourceExistsError:
