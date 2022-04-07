@@ -53,12 +53,12 @@ python3 app.py
 #### Configuración:
 
 ```python
-AZURE_ACC_KEY = ...        #Cambiar a la llave de cuenta correspondiente.
-AZURE_ACC_NAME = ...       #Cambiar al nombre de cuenta correspondiente.
-container_name = ...       #Cambiar al nombre de blob container correspondiente.
+AZURE_ACC_KEY = ...        # Cambiar a la llave de cuenta correspondiente.
+AZURE_ACC_NAME = ...       # Cambiar al nombre de cuenta correspondiente.
+container_name = ...       # Cambiar al nombre de blob container correspondiente.
 AUTH_DETAILS = {
-    'user': "",     #Cambiar como sea conveniente.
-    'password': "", #Cambiar como sea conveniente.
+    'user': "",            # Cambiar como sea conveniente.
+    'password': "",        # Cambiar como sea conveniente.
     'login':'Login'
 }
 ```
