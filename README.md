@@ -12,7 +12,7 @@
 
 ---
 
-## TLP: WHITE
+## TLP: CLEAR
 
 #### Requerimientos:
 
